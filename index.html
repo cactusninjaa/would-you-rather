@@ -168,12 +168,12 @@
 
     socket.on('update-scores', (scores) => {
       const percentageScore = calculatePercentage(scores)
-      document.getElementById('choice1').textContent = `Choice 1 ${percentageScore.choice1}% (${scores.choice1}) `;
+      document.getElementById('choice1').textContent = `Choice 1 ${percentageScore.choice1}% (${scores.choice1})`;
       document.getElementById('choice2').textContent = `Choice 2 ${percentageScore.choice2}% (${scores.choice2})`;
+      scores.choice1 > scores.choice2 ? document.getElementById('choice2').style.backgroundColor = "#138496" : document.getElementById('choice1').style.backgroundColor = "#138496"
     });
 
     startGameButton.addEventListener('click', startGame)
-    
     loadConfig();
     showRoomList()
     updateRoomConnectedTo()
