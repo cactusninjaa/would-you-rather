@@ -34,10 +34,12 @@ app.get('/questions', async (req, res) => {
     }
   };
 
+
   try {
     const response = await fetch(url, options);
     const result = await response.json();
     res.json(result);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch question' });
@@ -65,7 +67,6 @@ io.on('connection', (socket) => {
       socket.join(roomName);
       io.emit('join-room', roomName);
 
-      // 👇 Si une partie est déjà en cours dans cette room
       if (gameState[roomName]) {
         socket.emit('question', {
           question: gameState[roomName].question,

@@ -93,7 +93,7 @@
 
     async function getQuestions() {
       try {
-        const response = await fetch('/api/questions');
+        const response = await fetch('/questions');
         const result = await response.json();
         return result;
       } catch (error) {
