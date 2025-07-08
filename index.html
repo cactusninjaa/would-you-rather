@@ -28,6 +28,15 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
+
+    let baseUrl = '';
+
+    async function loadConfig() {
+      const res = await fetch('/config.json');
+      const config = await res.json();
+      baseUrl = config.baseUrl;
+    }
+
     const socket = io();
 
     const roomList = document.getElementById('room-list')
@@ -80,7 +89,7 @@
     })
     
     async function showRoomList() {
-      const response = await fetch(`http://localhost:3000/rooms`);
+      const response = await fetch(`${baseUrl}/rooms`);
       const data = await response.json();
       const childs = document.querySelectorAll('#room-list li')
       childs.forEach(child => {roomList.removeChild(child)})
@@ -93,7 +102,7 @@
 
     async function getQuestions() {
       try {
-        const response = await fetch('/questions');
+        const response = await fetch(`${baseUrl}/questions`);
         const result = await response.json();
         return result;
       } catch (error) {
@@ -102,7 +111,11 @@
     }
 
     async function startGame() {
+      if (!baseUrl) await loadConfig();
+
       const poll = await getQuestions();
+      console.log(poll)
+      if (!poll) return;
       const room = document.getElementById('room-connected-to').textContent.trim(); 
       const questionsArea = document.getElementById('question-area');
 
@@ -154,6 +167,8 @@
     });
 
     startGameButton.addEventListener('click', startGame)
+    
+    loadConfig();
     showRoomList()
     updateRoomConnectedTo()
   </script>

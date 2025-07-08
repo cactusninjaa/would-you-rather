@@ -50,6 +50,12 @@ app.get('/rooms', (req, res) => {
   res.send(roomList)
 })
 
+app.get('/config.json', (req, res) => {
+  res.json({
+    baseUrl: process.env.BASE_URL || `http://localhost:${PORT}`
+  });
+});
+
 io.on('connection', (socket) => {
   socket.on('create-room', (roomName, callback) => {
     if (!roomList.includes(roomName)){
