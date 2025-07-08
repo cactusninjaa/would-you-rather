@@ -72,6 +72,8 @@ io.on('connection', (socket) => {
     if (roomList.includes(roomName)) {
       socket.join(roomName);
       io.emit('join-room', roomName);
+      const count = io.sockets.adapter.rooms.get(roomName)?.size || 0;
+      io.to(roomName).emit('roomCount', count);
 
       if (gameState[roomName]) {
         socket.emit('question', {
@@ -83,6 +85,15 @@ io.on('connection', (socket) => {
       callback({ success: true, message: 'Joined room', room: roomName });
     } else {
       callback({ success: false, message: 'Non existing room', room: roomName });
+    }
+  });
+
+  socket.on('disconnecting', () => {
+    for (const room of socket.rooms) {
+      if (room !== socket.id) {
+        const newCount = (io.sockets.adapter.rooms.get(room)?.size || 1) - 1;
+        io.to(room).emit('roomCount', newCount);
+      }
     }
   });
 

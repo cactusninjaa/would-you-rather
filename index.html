@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="">
   </head>
   <body>
-    <p>Connécté à la room : <span id="room-connected-to"></span></p>
+    <p>Connécté à la room : <span id="room-connected-to"></span> il y a <span id="room-count">0</span> personnes dedans</p>
     <hr />
     <ul id="room-list"></ul>
     <hr />
@@ -114,7 +114,6 @@
       if (!baseUrl) await loadConfig();
 
       const poll = await getQuestions();
-      console.log(poll)
       if (!poll) return;
       const room = document.getElementById('room-connected-to').textContent.trim(); 
       const questionsArea = document.getElementById('question-area');
@@ -132,6 +131,10 @@
       document.getElementById('choice2').disabled = true
       document.getElementById('choice1').disabled = true
     }
+
+    socket.on('roomCount', (count) => {
+      document.getElementById('room-count').textContent = count;
+    });
   
     socket.on('question', (question) => {
       const questionsArea = document.getElementById('question-area');
@@ -157,7 +160,10 @@
 
     function calculatePercentage(scores){
       const totalVote = scores.choice1 + scores.choice2
-      return {choice1 : scores.choice1 / totalVote * 100, choice2: scores.choice2 / totalVote * 100}
+      return {
+        choice1 : Math.round(scores.choice1 / totalVote * 100), 
+        choice2: Math.round(scores.choice2 / totalVote * 100)
+      }
     }
 
     socket.on('update-scores', (scores) => {
