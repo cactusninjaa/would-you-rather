@@ -1,0 +1,116 @@
+/* Style général */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+h1, h2, h3 {
+  color: #222;
+}
+
+/* Room info */
+#room-connected-to {
+  font-weight: bold;
+  color: #2a8cff;
+}
+
+/* Separateurs */
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
+/* Liste des rooms */
+#room-list {
+  list-style: none;
+  padding: 0;
+}
+
+#room-list li {
+  background: #fff;
+  margin-bottom: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Formulaires */
+form {
+  margin-bottom: 10px;
+}
+
+form input[type="text"] {
+  padding: 8px;
+  font-size: 14px;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #2a8cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+form button:hover {
+  background-color: #1e6fd6;
+}
+
+/* Bouton Start */
+#start-game {
+  display: inline-block;
+  margin: 10px 0;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#start-game:hover {
+  background-color: #218838;
+}
+
+/* Zone des questions */
+#question-area {
+  margin-top: 20px;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+#question-area p {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#question-area button {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 14px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+#question-area button:hover {
+  background-color: #138496;
+}

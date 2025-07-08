@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Would-you-rather</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="">
+  </head>
+  <body>
+    <p>Connécté à la room : <span id="room-connected-to"></span></p>
+    <hr />
+    <ul id="room-list"></ul>
+    <hr />
+    <form id="create-room-form" action="">
+      <input type="text" id="create-room-input" placeholder="Room name">
+      <button type="submit">Create room</button>
+    </form>
+    <form id="join-room-form" action="">
+      <input type="text" id="join-room-input" placeholder="Room name">
+      <button type="submit">Join room</button>
+    </form>
+    <hr />
+    <button id="start-game">Start</button>
+    <div id="question-area">
+    </div>
+  </body>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const roomList = document.getElementById('room-list')
+
+    const createRoomForm = document.getElementById('create-room-form');
+    const createRoomInput = document.getElementById('create-room-input');
+    const joinRoomForm = document.getElementById('join-room-form');
+    const joinRoomInput = document.getElementById('join-room-input');
+
+    const startGameButton = document.getElementById('start-game')
+
+    function updateRoomConnectedTo(roomName = "aucune") {
+      const roomConnectedTo = document.getElementById('room-connected-to')
+      roomConnectedTo.textContent = roomName 
+    }
+
+    createRoomForm.addEventListener('submit', (e) => {
+      e.preventDefault()
+      if (createRoomInput.value) {
+        socket.emit('create-room', createRoomInput.value, (response) => { 
+          if (response.success){
+            showRoomList() 
+            socket.emit('join-room', createRoomInput.value, (response) => { 
+              if (response.success){
+                updateRoomConnectedTo(createRoomInput.value)
+              } else {
+                alert(response.message)
+              }    
+            createRoomInput.value = ''
+            });
+          } else {
+            alert(response.message)
+          }
+        });
+      }
+    })
+
+    joinRoomForm.addEventListener('submit', (e) => {
+      e.preventDefault()
+      if (joinRoomInput.value) {
+        socket.emit('join-room', joinRoomInput.value, (response) => { 
+          if (response.success){
+            updateRoomConnectedTo(joinRoomInput.value)
+          } else {
+            alert(response.message)
+          }
+          joinRoomInput.value = ''
+        }); 
+      }
+    })
+    
+    async function showRoomList() {
+      const response = await fetch(`http://localhost:3000/rooms`);
+      const data = await response.json();
+      const childs = document.querySelectorAll('#room-list li')
+      childs.forEach(child => {roomList.removeChild(child)})
+      data.forEach(roomName => {
+        const room = document.createElement('li')
+        room.textContent = roomName
+        roomList.appendChild(room)
+      })
+    }
+
+    async function getQuestions() {
+      try {
+        const response = await fetch('/api/questions');
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error(error);
+      } 
+    }
+
+    async function startGame() {
+      const poll = await getQuestions();
+      const room = document.getElementById('room-connected-to').textContent.trim(); 
+      const questionsArea = document.getElementById('question-area');
+
+      socket.emit('send-question', poll, room, (response) => { 
+        if (response.success) {
+          console.log('startGame');
+        } else {
+          alert(response.message);
+        }
+      });
+    }
+  
+    socket.on('question', (question) => {
+      const questionsArea = document.getElementById('question-area');
+      startGameButton.textContent = 'Next'
+      questionsArea.innerHTML = `
+        <p>${question.question}</p>
+        <button id="choice1">Choice 1</button>
+        <button id="choice2">Choice 2</button>
+      `;
+
+      const room = document.getElementById('room-connected-to').textContent.trim();
+
+      document.getElementById('choice1').addEventListener('click', () => {
+        socket.emit('vote', room, 'choice1');
+      });
+      document.getElementById('choice2').addEventListener('click', () => {
+        socket.emit('vote', room, 'choice2');
+      });
+    });
+
+    socket.on('update-scores', (scores) => {
+      document.getElementById('choice1').textContent = `Choice 1 (${scores.choice1})`;
+      document.getElementById('choice2').textContent = `Choice 2 (${scores.choice2})`;
+    });
+
+
+    startGameButton.addEventListener('click', startGame)
+    showRoomList()
+    updateRoomConnectedTo()
+  </script>
+</html>
