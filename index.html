@@ -114,6 +114,11 @@
         }
       });
     }
+
+    function disableButton(){
+      document.getElementById('choice2').disabled = true
+      document.getElementById('choice1').disabled = true
+    }
   
     socket.on('question', (question) => {
       const questionsArea = document.getElementById('question-area');
@@ -127,18 +132,26 @@
       const room = document.getElementById('room-connected-to').textContent.trim();
 
       document.getElementById('choice1').addEventListener('click', () => {
+        disableButton()
         socket.emit('vote', room, 'choice1');
+        
       });
       document.getElementById('choice2').addEventListener('click', () => {
+        disableButton()
         socket.emit('vote', room, 'choice2');
       });
     });
 
-    socket.on('update-scores', (scores) => {
-      document.getElementById('choice1').textContent = `Choice 1 (${scores.choice1})`;
-      document.getElementById('choice2').textContent = `Choice 2 (${scores.choice2})`;
-    });
+    function calculatePercentage(scores){
+      const totalVote = scores.choice1 + scores.choice2
+      return {choice1 : scores.choice1 / totalVote * 100, choice2: scores.choice2 / totalVote * 100}
+    }
 
+    socket.on('update-scores', (scores) => {
+      const percentageScore = calculatePercentage(scores)
+      document.getElementById('choice1').textContent = `Choice 1 ${percentageScore.choice1}% (${scores.choice1}) `;
+      document.getElementById('choice2').textContent = `Choice 2 ${percentageScore.choice2}% (${scores.choice2})`;
+    });
 
     startGameButton.addEventListener('click', startGame)
     showRoomList()
